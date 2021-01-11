@@ -9,5 +9,9 @@ class MyStyle {
 
   TextStyle pinkStyle() => TextStyle(color: Colors.pink);
 
+  double findScreen(BuildContext context) {
+    return MediaQuery.of(context).size.width;
+  }
+
   MyStyle();
 }

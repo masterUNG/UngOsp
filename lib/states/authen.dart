@@ -43,7 +43,7 @@ class _AuthenState extends State<Authen> {
 
   TextButton buildRegister() {
     return TextButton(
-      onPressed: () {},
+      onPressed: () => Navigator.pushNamed(context, '/register'),
       child: Text(
         'New Register',
         style: MyStyle().pinkStyle(),
