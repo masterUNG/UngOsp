@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:ungosp/utility/my_style.dart';
 
 class Register extends StatefulWidget {
@@ -9,12 +11,36 @@ class Register extends StatefulWidget {
 class _RegisterState extends State<Register> {
   double screen;
   String typeUser;
+  double lat, lng;
+
+  @override
+  void initState() {
+    super.initState();
+    findLatLng();
+  }
+
+  Future<Null> findLatLng() async {
+    LocationData data = await findLocationData();
+    setState(() {
+      lat = data.latitude;
+      lng = data.longitude;
+    });
+  }
+
+  Future<LocationData> findLocationData() async {
+    Location location = Location();
+    try {
+      return location.getLocation();
+    } catch (e) {
+      return null;
+    }
+  }
 
   Container buildName() {
     return Container(
       decoration: BoxDecoration(
           color: Colors.white54, borderRadius: BorderRadius.circular(20)),
-      margin: EdgeInsets.only(top: 50),
+      margin: EdgeInsets.only(top: 16),
       width: screen * 0.6,
       child: TextField(
         decoration: InputDecoration(
@@ -73,7 +99,7 @@ class _RegisterState extends State<Register> {
             Icons.lock_outline,
             color: MyStyle().darkColor,
           ),
-          hintText: 'User :',
+          hintText: 'Password :',
           enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),
               borderSide: BorderSide(color: MyStyle().darkColor)),
@@ -101,15 +127,38 @@ class _RegisterState extends State<Register> {
             buildRadioShoper(),
             buildUser(),
             buildPassword(),
-            Expanded(
-              child: Container(margin: EdgeInsets.all(16),
-                width: screen,
-                color: Colors.grey,
-                child: Text('This is Map'),
-              ),
-            )
+            buildMap()
           ],
         ),
+      ),
+    );
+  }
+
+  Set<Marker> markers() => <Marker>[
+        Marker(
+          markerId: MarkerId('idMarker1'),
+          position: LatLng(lat, lng),
+          infoWindow: InfoWindow(
+              title: 'คุณอยู่่ที่นี่', snippet: 'Lat = $lat, Lng = $lng'),
+        ),
+      ].toSet();
+
+  Expanded buildMap() {
+    return Expanded(
+      child: Container(
+        margin: EdgeInsets.all(16),
+        width: screen,
+        child: lat == null
+            ? MyStyle().showProgress()
+            // : Text('Lat = $lat, lng = $lng'),
+            : GoogleMap(
+                markers: markers(),
+                initialCameraPosition: CameraPosition(
+                  target: LatLng(lat, lng),
+                  zoom: 16,
+                ),
+                onMapCreated: (controller) {},
+              ),
       ),
     );
   }
