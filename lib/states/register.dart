@@ -260,6 +260,14 @@ class _RegisterState extends State<Register> {
         print('Register Success uid = $uid');
         await value.user.updateProfile(displayName: name);
 
+        Map<String, dynamic> map = Map();
+        map['typeuser'] = typeUser;
+
+        await FirebaseFirestore.instance
+            .collection('typeuser')
+            .doc(uid)
+            .set(map);
+
         UserModel model = UserModel(
             email: user,
             lat: lat.toString(),

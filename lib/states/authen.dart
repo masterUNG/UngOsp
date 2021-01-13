@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:ungosp/utility/dialog.dart';
 import 'package:ungosp/utility/my_style.dart';
 
 class Authen extends StatefulWidget {
@@ -10,6 +14,7 @@ class Authen extends StatefulWidget {
 class _AuthenState extends State<Authen> {
   double screen;
   bool status = true;
+  String user, password;
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +63,13 @@ class _AuthenState extends State<Authen> {
       child: RaisedButton(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         color: MyStyle().darkColor,
-        onPressed: () {},
+        onPressed: () {
+          if ((user?.isEmpty ?? true) || (password?.isEmpty ?? true)) {
+            normalDialog(context, 'Have Space ? Please Fill Every Blank');
+          } else {
+            checkAuthen();
+          }
+        },
         child: Text(
           'Login',
           style: MyStyle().whiteStyle(),
@@ -74,6 +85,7 @@ class _AuthenState extends State<Authen> {
       margin: EdgeInsets.only(top: 16),
       width: screen * 0.6,
       child: TextField(
+        onChanged: (value) => user = value.trim(),
         decoration: InputDecoration(
           hintStyle: TextStyle(color: MyStyle().darkColor),
           prefixIcon: Icon(
@@ -93,10 +105,13 @@ class _AuthenState extends State<Authen> {
   }
 
   Container buildPassword() {
-    return Container(decoration: BoxDecoration(color: Colors.white54, borderRadius: BorderRadius.circular(20)),
+    return Container(
+      decoration: BoxDecoration(
+          color: Colors.white54, borderRadius: BorderRadius.circular(20)),
       margin: EdgeInsets.only(top: 16),
       width: screen * 0.6,
       child: TextField(
+        onChanged: (value) => password = value.trim(),
         obscureText: status,
         decoration: InputDecoration(
           suffixIcon: IconButton(
@@ -143,5 +158,31 @@ class _AuthenState extends State<Authen> {
       width: screen * 0.33,
       child: Image.asset('images/logo.png'),
     );
+  }
+
+  Future<Null> checkAuthen() async {
+    await Firebase.initializeApp().then((value) async {
+      await FirebaseAuth.instance
+          .signInWithEmailAndPassword(email: user, password: password)
+          .then((value) async {
+        String uid = value.user.uid;
+        print('uid = $uid');
+
+        await FirebaseFirestore.instance
+            .collection('typeuser')
+            .doc(uid)
+            .snapshots()
+            .listen((event) {
+          String typeUser = event.data()['typeuser'];
+          print('typeUser = $typeUser');
+
+          Navigator.pushNamedAndRemoveUntil(
+              context, '/myService$typeUser', (route) => false);
+
+        });
+      }).catchError((value) {
+        normalDialog(context, value.message);
+      });
+    });
   }
 }

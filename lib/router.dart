@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:ungosp/states/authen.dart';
-import 'package:ungosp/states/my_service.dart';
+import 'package:ungosp/states/my_serivce_shoper.dart';
+import 'package:ungosp/states/my_service_user.dart';
 import 'package:ungosp/states/register.dart';
 
 final Map<String, WidgetBuilder> myRoutes = {
   '/authen': (BuildContext context) => Authen(),
   '/register': (BuildContext context) => Register(),
-  '/myService': (BuildContext context) => MyService(),
+  '/myServiceUser': (BuildContext context) => MyServiceUser(),
+  '/myServiceShoper': (BuildContext context) => MyServiceShoper(),
 };
