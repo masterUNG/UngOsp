@@ -7,7 +7,13 @@ Future<Null> normalDialog(BuildContext context, String string) async {
       title: ListTile(
         leading: Image.asset('images/logo.png'),
         title: Text(string),
-      ),children: [TextButton(onPressed: () => Navigator.pop(context), child: Text('OK'))],
+      ),
+      children: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text('OK'),
+        ),
+      ],
     ),
   );
 }
